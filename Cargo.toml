@@ -5,3 +5,11 @@ authors = ["Samuel Marks <@SamuelMarks>"]
 edition = "2018"
 
 [dependencies]
+actix = "0.7.9"
+actix-web = "0.7.18"
+bincode = "1.0.1"
+bytes = "*"
+futures = "*"
+log = "0.4"
+serde = "1.0.80"
+serde_derive = "1.0.80"
