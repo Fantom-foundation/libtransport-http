@@ -5,7 +5,6 @@ extern crate serde_derive;
 
 pub mod server;
 
-
 #[cfg(test)]
 mod tests {
     #[test]
