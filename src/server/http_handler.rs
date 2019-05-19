@@ -7,6 +7,7 @@ use super::AppState;
 use super::heartbeat::GetHeartbeatCount;
 
 use actix::prelude::*;
+use std::sync::atomic::Ordering;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct SubmitTransaction {
@@ -51,7 +52,7 @@ pub fn submit_transaction(
 pub fn heartbeat(req: &HttpRequest<AppState>) -> HttpResponse {
     debug!("{:?}", req);
 
-    *(req.state().counter.lock().unwrap()) += 1;
+    req.state().counter.fetch_add(1, Ordering::Relaxed);
 
     let res = req.state().heartbeat_counter.send(GetHeartbeatCount);
 
@@ -67,7 +68,7 @@ pub fn heartbeat(req: &HttpRequest<AppState>) -> HttpResponse {
 
     HttpResponse::Ok().body(format!(
         "Num of requests: {}",
-        req.state().counter.lock().unwrap()
+        req.state().counter.load(Ordering::Relaxed),
     ))
 }
 

@@ -2,8 +2,8 @@ use actix_web::{http, middleware, server, App};
 
 use actix::prelude::*;
 
+use std::sync::atomic::AtomicUsize;
 use std::sync::Arc;
-use std::sync::Mutex;
 
 mod heartbeat;
 pub mod http_handler;
@@ -17,7 +17,7 @@ pub struct Server;
 
 #[derive(Clone)]
 pub struct AppState {
-    counter: Arc<Mutex<usize>>,
+    counter: Arc<AtomicUsize>,
     heartbeat_counter: Addr<Heartbeat>,
 }
 
@@ -25,7 +25,7 @@ impl Server {
     pub fn create_app() -> App<AppState> {
         let addr = Arbiter::start(move |_| Heartbeat { count: 0 });
 
-        let counter = Arc::new(Mutex::new(0));
+        let counter = Arc::new(AtomicUsize::new(0));
 
         App::with_state(AppState {
             counter: counter.clone(),
@@ -46,9 +46,9 @@ impl Server {
     pub fn init(
     ) -> server::HttpServer<App<AppState>, impl Fn() -> App<AppState> + Send + Clone + 'static>
     {
-        let counter: Arc<Mutex<usize>> = Arc::new(Mutex::new(0));
+        let counter = Arc::new(AtomicUsize::new(0));
 
-        let addr: Addr<Heartbeat> = Arbiter::start(move |_| Heartbeat { count: 0 });
+        let addr = Arbiter::start(move |_| Heartbeat { count: 0 });
 
         server::new(move || -> App<AppState> {
             App::with_state(AppState {
